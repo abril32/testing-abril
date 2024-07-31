@@ -53,25 +53,27 @@ def register():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+        email = request.form ['email']
         db = get_db()
         error = None
 
         if not username:
-            error = "Username is required."
+            error = "Se necesita un usuario."
         elif not password:
-            error = "Password is required."
+            error = "Se necesita una contraseña."
+        elif not email:
+            error = 'Error! es necesario un mail'
 
         if error is None:
             try:
                 db.execute(
-                    "INSERT INTO user (username, password) VALUES (?, ?)",
-                    (username, generate_password_hash(password)),
-                )
+                    "INSERT INTO user (username, password,email) VALUES (?, ?, ?)",
+                    (username, generate_password_hash(password), email),                 )
                 db.commit()
             except db.IntegrityError:
                 # The username was already taken, which caused the
                 # commit to fail. Show a validation error.
-                error = f"User {username} is already registered."
+                error = f"Usuario {username} ya esta registrado."
             else:
                 # Success, go to the login page.
                 return redirect(url_for("auth.login"))
@@ -94,9 +96,9 @@ def login():
         ).fetchone()
 
         if user is None:
-            error = "Incorrect username."
+            error = "Usuario incorrecto."
         elif not check_password_hash(user["password"], password):
-            error = "Incorrect password."
+            error = "Contraseña incorrecta."
 
         if error is None:
             # store the user id in a new session and return to the index
