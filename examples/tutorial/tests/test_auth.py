@@ -27,13 +27,15 @@ def test_register(client, app):
         ("", "a", "a", "Se necesita un usuario."),
         ("a", "", "a", "Error! es necesario un mail"),
         ("a", "a", "", "Se necesita una contraseña."),
-        ("test", "mail", "test", "ya esta registrado."),
+        ("test", "ñlkñlkñlk", "test", "Usuario test ya esta registrado."),
+        ("adfg", "mail", "test", "Mail mail ya esta registrado."),
     ),
 )
 def test_register_validate_input(client, username, email, password, message):
     response = client.post(
         "/auth/register", data={"username": username, "password": password, "email":email}
     )
+    print(response.data.decode())
     assert message in response.data.decode()
 
 
