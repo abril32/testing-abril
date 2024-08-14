@@ -121,3 +121,41 @@ def logout():
     """Clear the current session, including the stored user id."""
     session.clear()
     return redirect(url_for("index"))
+
+@bp.route('/change', methods=('GET','POST'))
+def change():
+    if request.method == 'POST':
+        email = request.form['nuevo_email']
+        db= get_db()
+        error = None
+        if not email:
+            error = 'Es necesario un mail.'
+
+        if error is None:
+            db.execute(
+                'UPDATE user SET email = ? WHERE id = ?', (email, g.user['id'])
+            )
+            db.commit()
+            return redirect(url_for('index'))
+
+
+    return render_template('auth/change.html')
+
+
+@bp.route('/delete', methods=('GET','POST'))
+def delete_usuario():
+    if request.method == 'POST':
+        db= get_db()
+        error = None
+
+    if error is None:
+        db.execute(
+            'DELETE user WHERE id = ?', (g.user['id'],)
+        )
+        db.commit()
+
+        return render_template('auth/change.html')
+
+@bp.before_app_request
+def load_logged_in_user():
+    user_id = session.get('user_id')
