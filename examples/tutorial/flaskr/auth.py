@@ -146,15 +146,13 @@ def change():
 def delete_usuario():
     if request.method == 'POST':
         db= get_db()
-        error = None
 
-    if error is None:
-        db.execute(
-            'DELETE user WHERE id = ?', (g.user['id'],)
-        )
-        db.commit()
+    db.execute(
+        'DELETE FROM user WHERE id = ?', (g.user['id'],)
+    )
+    db.commit()
 
-        return render_template('auth/change.html')
+    return redirect(url_for('index'))
 
 @bp.before_app_request
 def load_logged_in_user():
